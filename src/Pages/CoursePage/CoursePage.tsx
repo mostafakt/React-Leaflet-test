@@ -1,13 +1,32 @@
 import { Box } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, FeatureGroup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  FeatureGroup,
+  Popup,
+} from "react-leaflet";
 import * as ReactDOM from "react-dom/client";
 import L from "leaflet";
 import "leaflet-draw/dist/leaflet.draw.css";
 import { EditControl } from "react-leaflet-draw";
 import "leaflet-draw";
 import { TextField } from "@material-ui/core";
-
+const MarcetName = () => {
+  const [name, setName] = useState("");
+  return (
+    <>
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => {
+          setName(e.target.value);
+        }}
+      />
+    </>
+  );
+};
 const CoursePage = () => {
   const [editableFG, setEditableFG] = useState();
   const [name] = useState("mark name");
@@ -20,10 +39,11 @@ const CoursePage = () => {
   let onCreated = (e: any) => {
     console.log(e);
     console.log(e.layerType);
-
-    console.log(name);
-    e.layer.bindPopup(name);
-
+    // if (e.layerType === "marker")
+    {
+      console.log(name);
+      e.layer.bindPopup(name);
+    }
     //@ts-ignore
     const drawnItems = editableFG.leafletElement._layers;
     console.log(drawnItems);
@@ -42,7 +62,14 @@ const CoursePage = () => {
   const onFeatureGroupReady = (reactFGref: any) => {
     setEditableFG(reactFGref);
   };
-
+  const renderPopupForm = (geoJsonString: string) => {
+    const popup = L.popup();
+    const container = L.DomUtil.create("div");
+    popup.setContent(container);
+    const root = ReactDOM.createRoot(container);
+    root.render(<>{geoJsonString}</>);
+    return popup;
+  };
   return (
     <Box
       sx={{
@@ -74,6 +101,15 @@ const CoursePage = () => {
             alignContent: "center",
           }}
         >
+          {/* {" "}
+        <TextField
+          type="text"
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            console.log(name);
+          }}
+        />{" "} */}
           <TextField
             placeholder="new map image Link"
             type="text"
@@ -106,6 +142,9 @@ const CoursePage = () => {
                 onFeatureGroupReady(featureGroupRef);
               }}
             >
+              {/* <Popup>
+              <MarcetName />
+            </Popup> */}
               <EditControl
                 draw={{
                   polyline: false,
